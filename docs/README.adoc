@@ -1,6 +1,6 @@
 = Soberbia
 :author: Manuel L. Quero
-:revdate: 2025-04-20
+:revdate: 2025-05-02
 :toc: left
 :doctype: book
 
