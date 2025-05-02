@@ -270,6 +270,8 @@ Podemos ver que, para escalar privilegios, debemos crear un archivo temporal con
 
 image::assets/atacar/escalada/root.png[somos root]
 
+<<<
+
 == Conclusión
 
 De esta forma hemos aprendido cómo funciona una máquina sencilla, con multiples vulnerabilidades, aprendiendo a usar herramientas reales y que normalmente se usan en estos entornos. Además hemos refrescado conocimientos y visto algunos de otra forma. Si queremos avanzar más en el mundo del hacking ético y aprender más recomiendo lo siguiente:
