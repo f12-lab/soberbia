@@ -1,0 +1,99 @@
+/* Estilo general */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1a2b3c;
+    color: #fff; 
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+/* Título principal */
+h2 {
+    color: #66aaff; 
+    font-size: 28px;
+    margin-top: 20px;
+}
+
+/* Estilo de formulario */
+form {
+    background-color: #335577;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Campos de texto */
+input[type="text"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #66aaff;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Botón de submit */
+input[type="submit"] {
+    background-color: #66aaff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+input[type="submit"]:hover {
+    background-color: #4c86b2;
+}
+
+/* Comentarios */
+h3 {
+    color: #66aaff;
+    font-size: 22px;
+    margin-top: 40px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+li {
+    background-color: #4a6777;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+strong {
+    color: #fff;
+}
+
+/* Estilo de sesión */
+form input[type="submit"]:nth-child(4) {
+    background-color: #ff6666;
+    color: white;
+}
+
+form input[type="submit"]:nth-child(4):hover {
+    background-color: #cc0000;
+}
