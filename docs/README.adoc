@@ -148,9 +148,9 @@ whatweb -a 3 -v http://172.17.0.2/1/2/4/23/dev/pruebas/login.php
 
 image::assets/recon/web/whatweb.png[whatweb]
 
-==== Ataque
+=== Ataque
 
-===== SQLI
+==== SQLI
 
 Conociendo un poco más a lo que nos enfrentamos, al ser un login podemos probar con sql, pero esta vez no lo vamos a hacer manual, obviamente hay formas más eficientes cómo *sqlmap*, donde comenzaremos por un reconocimiento sabiendo si es vulnerable a SQLi.
 
@@ -198,7 +198,7 @@ image::assets/atacar/sqli/sqliattack.png[ataque sqli]
 
 Como podemos ver, hemos obtenido las credenciales de los usuarios admin y test, por lo que podremos pasar el login.
 
-===== Cookies
+==== Cookies
 
 Una vez en comentarios, podemos probar cómo funciona el sistema, enviamos un mensaje y nos lo devuelve. Esto nos puede recordar al XSS que hicimos, asi que podemos obtener las cookies por *netcat* o mirar en Storage al F12.
 
@@ -252,7 +252,7 @@ Una vez hecho esto ya tendríamos las credenciales del ssh. Pero también hay ot
 
 image::assets/atacar/xss/F12.png[inspeccionar]
 
-===== SSH y escalada de privilegios
+==== SSH y escalada de privilegios
 
 Con las credeciales ssh, nos conectamos al servidor:
 
