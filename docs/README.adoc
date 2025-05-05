@@ -314,12 +314,12 @@ image::assets/atacar/xss/F12.png[inspeccionar]
 
 Con las credeciales ssh, nos conectamos al servidor:
 
-[.text-center]
-image::assets/atacar/escalada/ssh.png[conexión con el servidor]
-
 .Pista 15
 [%collapsible]
 ====
+[.text-center]
+image::assets/atacar/escalada/ssh.png[conexión con el servidor]
+
 Ahora veremos si tenemos algún privilegio:
 
 [.text-center]
