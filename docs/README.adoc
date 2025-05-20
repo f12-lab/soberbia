@@ -196,7 +196,7 @@ sqlmap -u "http://172.17.0.2/1/2/4/23/dev/pruebas/login.php" --data "usuario=adm
 
 image::assets/atacar/sqli/sqlmap.png[sqlmap recon,align=center]
 
-Cómo podemos ver el parametro usuario es vulnerable, además más abajo se especifica la versión de Mariadb. Ahora vamos a atacar y obtener las credenciales.
+Cómo podemos ver el parámetro usuario es vulnerable, además más abajo se especifica la versión de Mariadb. Ahora vamos a atacar y obtener las credenciales.
 ====
 
 .Pista 9
@@ -224,7 +224,7 @@ Una vez en comentarios, podemos probar cómo funciona el sistema, enviamos un me
 .Pista 10
 [%collapsible]
 ====
-Podemos hacer un ataque XSS almacenado, asi que podemos obtener las cookies por *netcat* o mirar en Storage al F12.
+Podemos hacer un ataque XSS almacenado, así que podemos obtener las cookies por *netcat* o mirar en Storage al F12.
 
 image::assets/atacar/xss/comentarios.png[página comentarios,align=center]
 ====
@@ -264,7 +264,7 @@ image::assets/atacar/xss/netcat2.png[envio de cookies a netcat,align=center]
 .Pista 13
 [%collapsible]
 ====
-Copiamos esta cadena y la decodificamos con *cyberchef*, una herramienta web muy util para estos casos. Usamos URL decode, para ver el contenido:
+Copiamos esta cadena y la decodificamos con *cyberchef*, una herramienta web muy útil para estos casos. Usamos URL decode, para ver el contenido:
 
 image::assets/atacar/xss/cyberchef.png[cyberchef,width=520,align=center]
 ====
@@ -328,7 +328,7 @@ image::assets/atacar/escalada/root.png[somos root,align=center]
 
 == Conclusión
 
-De esta forma hemos aprendido cómo funciona una máquina sencilla, con multiples vulnerabilidades, aprendiendo a usar herramientas reales y que normalmente se usan en estos entornos. Además hemos refrescado conocimientos y visto algunos de otra forma. Si queremos avanzar más en el mundo del hacking ético y aprender más recomiendo lo siguiente:
+De esta forma hemos aprendido cómo funciona una máquina sencilla, con múltiples vulnerabilidades, aprendiendo a usar herramientas reales y que normalmente se usan en estos entornos. Además, hemos refrescado conocimientos y visto algunos de otra forma. Si queremos avanzar más en el mundo del hacking ético y aprender más recomiendo lo siguiente:
 
 * Conocerte bien, saber qué rama quieres aprender, centrándote en atacar o en defender, es vital para luego hacer los certificados, ya que sabrás en cual encajas mejor.
 * Hacer muchas máquinas, esto ha sido un ensayo, donde hemos aprendido lo más básico, allí fuera en internet hay máquinas mucho más complejas y divertidas de explorar. Por ello recomiendo:
@@ -338,9 +338,9 @@ De esta forma hemos aprendido cómo funciona una máquina sencilla, con multiple
 ** Academias cómo Udemy.
 ** Canales cómo S4vitar, MoureDev, El Pingüino de Mario, NetworkChuck, David Bombal, LaurieWired.
 * Por último, hacer certificaciones, hay obviamente cursos que te preparan para ello, y es muy recomendable tenerlos para demostrar que sabes hacerlo.
-** Dejo este roadmap que nos puede ser muy util para planificar nuestros estudios https://pauljerimy.com/security-certification-roadmap/[CERTS].
+** Dejo este roadmap que nos puede ser muy útil para planificar nuestros estudios https://pauljerimy.com/security-certification-roadmap/[CERTS].
 
-Espero que os haya gustado este viaje por las entrañas del infierno, donde hemos aprendido los principales vectores de ataque y cómo mitigarlos. Vuestro Vírgilio se despide de vosotros.
+Espero que os haya gustado este viaje por las entrañas del infierno, donde hemos aprendido los principales vectores de ataque y cómo mitigarlos. Vuestro Virgilio se despide de vosotros.
 
 ----
 "Cuanto más silencioso te vuelves, más puedes oír." 
